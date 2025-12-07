@@ -1,38 +1,36 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
-const mysql = require('mysql2');
 const bodyParser = require('body-parser');
+require('dotenv').config();
+
+// Import Routes
+const donorRoutes = require('./routes/donors');
+const patientRoutes = require('./routes/patients');
+const matchingRoutes = require('./routes/matching');
+// const transplantRoutes = require('./routes/transplants'); // Uncomment if you implement transplants
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+app.use(cors()); // Allows frontend to communicate
+app.use(express.json()); // Parse JSON bodies
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// MySQL Connection
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'Lsjs@1002',
-  database: 'odms' // change to your database name
-});
+// Mount Routes
+app.use('/api/donors', donorRoutes);
+app.use('/api/patients', patientRoutes);
+app.use('/api/matches', matchingRoutes);
 
-db.connect((err) => {
-  if (err) {
-    console.error('DB connection failed:', err.message);
-    return;
-  }
-  console.log('Connected to MySQL database.');
-});
-
-// Example API route
+// Base Route
 app.get('/', (req, res) => {
-  res.send('ODMS Backend is running');
+  res.send('Organova Backend API is Running...');
 });
 
+// Start Server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`\n🚀 Server is running on http://localhost:${PORT}`);
+  console.log(`   - Donors API: http://localhost:${PORT}/api/donors`);
+  console.log(`   - Patients API: http://localhost:${PORT}/api/patients`);
+  console.log(`   - Matching API: http://localhost:${PORT}/api/matches/run\n`);
 });
